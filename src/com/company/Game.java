@@ -6,7 +6,7 @@ public class Game {
 
     Square[][] board;
     Player[] players;
-    Square[] possibleMoves;
+    Square[] availableMoves;
     int size;
 
     public Game(int size, Player player1, Player player2) {
@@ -19,7 +19,7 @@ public class Game {
 
     void start() {
         for (int currentPlayer = 0; !isGameOver(); currentPlayer ^= 1) {
-            boolean isMoveValid = players[currentPlayer].move(possibleMoves, this);
+            boolean isMoveValid = players[currentPlayer].move(availableMoves, this);
             System.out.println(isMoveValid);
             System.out.println(toString());
         }
@@ -35,7 +35,7 @@ public class Game {
                 board[i][j] = square;
             }
         }
-        this.possibleMoves = moves;
+        this.availableMoves = moves;
     }
 
     int getScoreForMove(Square square, Player player) {
@@ -74,18 +74,18 @@ public class Game {
 
     boolean makeMove(Square square, Player player) {
         boolean found = false;
-        for (int i = 0; i < possibleMoves.length && !found; i++) {
-            if (possibleMoves[i].equals(square) && !possibleMoves[i].isMarked()) {
+        for (int i = 0; i < availableMoves.length && !found; i++) {
+            if (availableMoves[i].equals(square) && !availableMoves[i].isMarked()) {
                 found = true;
-                possibleMoves[i].markSquare(player);
+                availableMoves[i].markSquare(player);
             }
         }
         return found;
     }
 
     boolean isGameOver() {
-        for (int i = 0; i < possibleMoves.length; i++) {
-            if (!possibleMoves[i].isMarked())
+        for (int i = 0; i < availableMoves.length; i++) {
+            if (!availableMoves[i].isMarked())
                 return false;
         }
         return true;

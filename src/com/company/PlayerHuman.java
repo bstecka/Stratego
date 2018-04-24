@@ -7,7 +7,7 @@ public class PlayerHuman extends Player {
     public PlayerHuman(char symbol) { super(symbol); }
 
     @Override
-    public boolean move(Square[] possibleMoves, Game gameState) {
+    public boolean move(Square[] availableMoves, Game gameState) {
         boolean isMoveValid = false;
         while (!isMoveValid) {
             Scanner sc = new Scanner(System.in);

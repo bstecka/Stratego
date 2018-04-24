@@ -9,12 +9,12 @@ public class PlayerRandom extends Player {
     }
 
     @Override
-    public boolean move(Square[] possibleMoves, Game gameState) {
+    public boolean move(Square[] availableMoves, Game gameState) {
         boolean isMoveValid = false;
         while (!isMoveValid) {
             Random rand = new Random();
-            int randomSqIndex = rand.nextInt(possibleMoves.length);
-            Square square = possibleMoves[randomSqIndex];
+            int randomSqIndex = rand.nextInt(availableMoves.length);
+            Square square = availableMoves[randomSqIndex];
             isMoveValid = gameState.makeMove(square, this);
             System.out.println("PlayerRandom " + isMoveValid);
             if (isMoveValid)
