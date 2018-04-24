@@ -72,7 +72,9 @@ public class Game {
         return player.getScore();
     }
 
-    boolean makeMove(Square square, Player player) {
+    ////? potentially move updateScoreForMove to makeMoveIfValid?
+
+    boolean makeMoveIfValid(Square square, Player player) {
         boolean found = false;
         for (int i = 0; i < availableMoves.length && !found; i++) {
             if (availableMoves[i].equals(square) && !availableMoves[i].isMarked()) {

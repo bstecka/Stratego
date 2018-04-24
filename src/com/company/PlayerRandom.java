@@ -15,7 +15,7 @@ public class PlayerRandom extends Player {
             Random rand = new Random();
             int randomSqIndex = rand.nextInt(availableMoves.length);
             Square square = availableMoves[randomSqIndex];
-            isMoveValid = gameState.makeMove(square, this);
+            isMoveValid = gameState.makeMoveIfValid(square, this);
             System.out.println("PlayerRandom " + isMoveValid);
             if (isMoveValid)
                 gameState.updateScoreForMove(square, this);
