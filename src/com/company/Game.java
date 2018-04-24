@@ -17,10 +17,11 @@ public class Game {
         initBoard();
     }
 
-    void run() {
-        for (int currentPlayer = 0; !isGameOver() && players[currentPlayer].move(possibleMoves); currentPlayer ^= 1) {
-            int currentSize = possibleMoves.length;
-            //std::cout << "**********************************\n" << this->toString() << "**********************************" << "\n";
+    void start() {
+        for (int currentPlayer = 0; !isGameOver(); currentPlayer ^= 1) {
+            boolean isMoveValid = players[currentPlayer].move(possibleMoves, this);
+            System.out.println(isMoveValid);
+            System.out.println(toString());
         }
     }
 

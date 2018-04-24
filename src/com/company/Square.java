@@ -10,11 +10,7 @@ public class Square {
         this.column = column;
     }
 
-    public Square(Player player) { this.player = player; }
-
     void markSquare(Player player) { this.player = player; }
-
-    void freeSquare() { this.player = null; }
 
     public Player getPlayer() { return player; }
 
@@ -29,5 +25,12 @@ public class Square {
             return " ";
         else
             return player.toString();
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof Square))
+            return false;
+        Square square = (Square) o;
+        return this.row == square.row && this.column == square.column;
     }
 }

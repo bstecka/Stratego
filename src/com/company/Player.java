@@ -2,15 +2,16 @@ package com.company;
 
 public abstract class Player implements PlayerI {
 
-    int number, score;
+    char symbol;
+    int score;
 
-    public Player(int number) {
-        this.number = number;
+    public Player(char symbol) {
+        this.symbol = symbol;
         this.score = 0;
     }
 
     public String toString() {
-        return "" + number;
+        return "" + symbol;
     }
 
     public void setScore(int score) {

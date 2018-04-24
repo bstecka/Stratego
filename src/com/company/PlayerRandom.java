@@ -1,0 +1,25 @@
+package com.company;
+
+import java.util.Random;
+
+public class PlayerRandom extends Player {
+
+    public PlayerRandom(char symbol) {
+        super(symbol);
+    }
+
+    @Override
+    public boolean move(Square[] possibleMoves, Game gameState) {
+        boolean isMoveValid = false;
+        while (!isMoveValid) {
+            Random rand = new Random();
+            int randomSqIndex = rand.nextInt(possibleMoves.length);
+            Square square = possibleMoves[randomSqIndex];
+            isMoveValid = gameState.makeMove(square, this);
+            System.out.println("PlayerRandom " + isMoveValid);
+            if (isMoveValid)
+                gameState.updateScoreForMove(square, this);
+        }
+        return isMoveValid;
+    }
+}
