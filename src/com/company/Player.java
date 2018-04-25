@@ -18,9 +18,7 @@ public abstract class Player implements PlayerI {
         this.score = score;
     }
 
-    public void incrementScore(int score) {
-        this.score += score;
-    }
+    public void incrementScore(int score) { this.score += score; }
 
     public int getScore() {
         return score;

@@ -12,6 +12,8 @@ public class Square {
 
     void markSquare(Player player) { this.player = player; }
 
+    void freeSquare() { this.player = null; }
+
     public Player getPlayer() { return player; }
 
     public boolean isMarked() { return player != null; }

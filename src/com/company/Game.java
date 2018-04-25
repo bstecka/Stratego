@@ -2,12 +2,14 @@ package com.company;
 
 import java.util.Arrays;
 
+import static java.lang.Math.max;
+
 public class Game {
 
-    Square[][] board;
-    Player[] players;
+    private Square[][] board;
+    private Player[] players;
     Square[] availableMoves;
-    int size;
+    private int size;
 
     public Game(int size, Player player1, Player player2) {
         this.size = size;
@@ -18,11 +20,21 @@ public class Game {
     }
 
     void start() {
-        for (int currentPlayer = 0; !isGameOver(); currentPlayer ^= 1) {
+        for (int currentPlayer = 0; !isBoardFull(); currentPlayer ^= 1) {
             boolean isMoveValid = players[currentPlayer].move(availableMoves, this);
             System.out.println(isMoveValid);
+            //players[currentPlayer].move(availableMoves, this);
             System.out.println(toString());
         }
+    }
+
+    public Player getOpponent(Player player) {
+        if (player.equals(players[0]))
+            return players[1];
+        if (player.equals(players[1]))
+            return  players[0];
+        else
+            return null;
     }
 
     void initBoard() {
@@ -66,6 +78,10 @@ public class Game {
         return points;
     }
 
+    public int getWinningScore() {
+        return max(players[0].getScore(), players[1].getScore());
+    }
+
     int updateScoreForMove(Square square, Player player) {
         int score = getScoreForMove(square, player);
         player.incrementScore(score);
@@ -82,10 +98,12 @@ public class Game {
                 availableMoves[i].markSquare(player);
             }
         }
+        //if (found)
+            //updateScoreForMove(square, player);
         return found;
     }
 
-    boolean isGameOver() {
+    boolean isBoardFull() {
         for (int i = 0; i < availableMoves.length; i++) {
             if (!availableMoves[i].isMarked())
                 return false;
