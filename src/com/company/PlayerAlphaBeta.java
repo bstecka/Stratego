@@ -21,7 +21,8 @@ public class PlayerAlphaBeta extends Player {
         return false;
     }
 
-    private boolean cut(Player player, int value, int alpha, int beta) {
+    private boolean cutoff(Player player, int value, int alpha, int beta) {
+        //return (player == this && value >= beta || player != this && value <= alpha);
         return player == this ? value >= beta : value <= alpha;
     }
 
@@ -41,7 +42,7 @@ public class PlayerAlphaBeta extends Player {
             int scoreToRestore;
             boolean wasCut = false;
             for (i = 0; i < availableMoves.length && !wasCut; i++){
-                if (!cut(player, bestWorstValue, alpha, beta)){
+                if (!cutoff(player, bestWorstValue, alpha, beta)){
                     if (!availableMoves[i].isMarked()) {
                         scoreToRestore = player.getScore();
                         availableMoves[i].markSquare(player);
