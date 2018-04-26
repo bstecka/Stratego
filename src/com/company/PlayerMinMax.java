@@ -13,7 +13,7 @@ public class PlayerMinMax extends Player {
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
-        Square square = minMax(availableMoves, depth, this, gameState).getKey();
+        Square square = minMax(availableMoves, gameState, this, depth).getKey();
         if (gameState.makeMoveIfValid(square, this)) {
             gameState.updateScoreForMove(square, this);
             return true;
@@ -21,40 +21,32 @@ public class PlayerMinMax extends Player {
         return false;
     }
 
-    private Pair<Square, Integer> minMax(Square[] availableMoves, int depth, Player player, Game gameState) {
+    private Pair<Square, Integer> minMax(Square[] availableMoves, Game gameState, Player player, int depth) {
         int i, bestWorstValue;
         Square bestMove = null;
         for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}
         if (depth == 0 || i >= availableMoves.length) {
             bestWorstValue = this.getScore() - gameState.getOpponent(this).getScore();
-            if (bestWorstValue == 2) {
-                System.out.println(gameState);
-                System.out.println(bestWorstValue);
-            }
         }
         else {
             if (player == this)
-                bestWorstValue = -10000;
+                bestWorstValue = Integer.MIN_VALUE;
             else
-                bestWorstValue = 10000;
+                bestWorstValue = Integer.MAX_VALUE;
             bestMove = availableMoves[i];
-            //bestWorstValue = gameState.getScoreForMove(bestMove, this);//here we do another marking of square bestMove
-            ///two lines above questionable
-            //bestMove.freeSquare();
-            int scoreBeforeMove;
+            int scoreToRestore;
             for (i = 0; i < availableMoves.length; i++){
                 if (!availableMoves[i].isMarked()) {
-                    scoreBeforeMove = player.getScore();
+                    scoreToRestore = player.getScore();
                     availableMoves[i].markSquare(player);
                     gameState.updateScoreForMove(availableMoves[i], player);
-                    int currentValue = minMax(availableMoves, depth - 1, gameState.getOpponent(player), gameState).getValue();
+                    int currentValue = minMax(availableMoves, gameState, gameState.getOpponent(player), depth - 1).getValue();
                     if (player == this && currentValue > bestWorstValue || player != this && currentValue < bestWorstValue) {
                         bestWorstValue = currentValue;
                         bestMove = availableMoves[i];
                     }
                     availableMoves[i].freeSquare();
-                    player.setScore(scoreBeforeMove);
-                    System.out.println("plScore " + player.getScore());
+                    player.setScore(scoreToRestore);
                 }
             }
         }
