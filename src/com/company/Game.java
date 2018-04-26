@@ -50,6 +50,7 @@ public class Game {
         this.availableMoves = moves;
     }
 
+    //marks Square
     int getScoreForMove(Square square, Player player) {
         square.markSquare(player);
         int i, depth, points = 0;
