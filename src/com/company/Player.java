@@ -2,8 +2,8 @@ package com.company;
 
 public abstract class Player implements PlayerI {
 
-    char symbol;
-    int score;
+    private char symbol;
+    private int score;
 
     public Player(char symbol) {
         this.symbol = symbol;

@@ -4,7 +4,7 @@ import javafx.util.Pair;
 
 public class PlayerMinMax extends Player {
 
-    int depth;
+    private int depth;
 
     public PlayerMinMax(char symbol, int depth) {
         super(symbol);
@@ -14,10 +14,8 @@ public class PlayerMinMax extends Player {
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
         Square square = minMax(availableMoves, gameState, this, depth).getKey();
-        if (gameState.makeMoveIfValid(square, this)) {
-            gameState.updateScoreForMove(square, this);
+        if (gameState.markSquareIfFree(square, this))
             return true;
-        }
         return false;
     }
 

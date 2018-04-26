@@ -16,10 +16,7 @@ public class PlayerHuman extends Player {
             System.out.println("Podaj kolumnę");
             int column = sc.nextInt();
             Square square = new Square(row, column);
-            isMoveValid = gameState.makeMoveIfValid(square, this);
-            System.out.println("PlayerHuman " + isMoveValid);
-            if (isMoveValid)
-                gameState.updateScoreForMove(square, this);
+            isMoveValid = gameState.markSquareIfFree(square, this);
         }
         return isMoveValid;
     }

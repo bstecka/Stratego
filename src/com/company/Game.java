@@ -19,12 +19,11 @@ public class Game {
         initBoard();
     }
 
-    void start() {
+    public void start() {
         for (int currentPlayer = 0; !isBoardFull(); currentPlayer ^= 1) {
             boolean isMoveValid = players[currentPlayer].move(availableMoves, this);
             System.out.println(isMoveValid);
-            //players[currentPlayer].move(availableMoves, this);
-            System.out.println(toString());
+            System.out.println(this.toString());
         }
     }
 
@@ -33,11 +32,10 @@ public class Game {
             return players[1];
         if (player.equals(players[1]))
             return  players[0];
-        else
-            return null;
+        return null;
     }
 
-    void initBoard() {
+    private void initBoard() {
         Square[] moves = new Square[size * size];
         board = new Square[size][size];
         for(int i = 0; i < size; i++) {
@@ -51,7 +49,9 @@ public class Game {
     }
 
     //marks Square
-    int getScoreForMove(Square square, Player player) {
+    public int getScoreForMove(Square square, Player player) {
+        boolean wasMarked = square.isMarked();
+
         square.markSquare(player);
         int i, depth, points = 0;
         int row = square.getRow(), column = square.getColumn();
@@ -76,6 +76,8 @@ public class Game {
         if((i == size || column + depth == -1) && pointsInDiagonal > 1)
             points += pointsInDiagonal;
 
+        //if (!wasMarked)
+        //    square.freeSquare();
         return points;
     }
 
@@ -83,15 +85,13 @@ public class Game {
         return max(players[0].getScore(), players[1].getScore());
     }
 
-    int updateScoreForMove(Square square, Player player) {
+    public int updateScoreForMove(Square square, Player player) {
         int score = getScoreForMove(square, player);
         player.incrementScore(score);
         return player.getScore();
     }
 
-    ////? potentially move updateScoreForMove to makeMoveIfValid?
-
-    boolean makeMoveIfValid(Square square, Player player) {
+    public boolean markSquareIfFree(Square square, Player player) {
         boolean found = false;
         for (int i = 0; i < availableMoves.length && !found; i++) {
             if (availableMoves[i].equals(square) && !availableMoves[i].isMarked()) {
@@ -99,12 +99,12 @@ public class Game {
                 availableMoves[i].markSquare(player);
             }
         }
-        //if (found)
-            //updateScoreForMove(square, player);
+        if (found)
+            updateScoreForMove(square, player);
         return found;
     }
 
-    boolean isBoardFull() {
+    public boolean isBoardFull() {
         for (int i = 0; i < availableMoves.length; i++) {
             if (!availableMoves[i].isMarked())
                 return false;
