@@ -11,14 +11,35 @@ public class Game {
     Square[] availableMoves;
     private int size;
 
+    private Player cur_player;
+
     public Game(int size, Player player1, Player player2) {
         this.size = size;
         this.players = new Player[2];
         this.players[0] = player1;
         this.players[1] = player2;
+        cur_player = player1;
         initBoard();
     }
 
+    public void switchPlayer() {
+        cur_player = getOpponent(cur_player);
+    }
+
+    public Player getCurrentPlayer() {
+        return cur_player;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public boolean moveCurrentPlayer(Square square) {
+        boolean isMoveValid = markSquareIfFree(square, cur_player);
+        return isMoveValid;
+    }
+
+    //////////////FORCONSOLE
     public void start() {
         for (int currentPlayer = 0; !isBoardFull(); currentPlayer ^= 1) {
             boolean isMoveValid = players[currentPlayer].move(availableMoves, this);
@@ -33,6 +54,10 @@ public class Game {
         if (player.equals(players[1]))
             return  players[0];
         return null;
+    }
+
+    public Square[][] getBoard() {
+        return board;
     }
 
     private void initBoard() {

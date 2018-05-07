@@ -11,7 +11,7 @@ public abstract class Player implements PlayerI {
     }
 
     public String toString() {
-        return "" + symbol;
+        return "" + getNumber();
     }
 
     public void setScore(int score) {
@@ -23,4 +23,6 @@ public abstract class Player implements PlayerI {
     public int getScore() {
         return score;
     }
+
+    public int getNumber() { return symbol == '#' ? 1 : 2; }
 }
