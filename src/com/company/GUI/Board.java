@@ -1,51 +1,82 @@
 package com.company.GUI;
 
 import com.company.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.shape.Circle;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.HBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class Board extends Application {
-    public int tileSize = 80;
-    public int boardSize = 5;
-    public double maxWidth;
-    public double maxHeight;
+    private int tileSize = 80;
+    private int boardSize = 5;
     private Group tileGroup = new Group();
     private Game game;
     private Square[][] board;
-    Text text;
-    Text text2;
-    Circle nextPlayerCircle;
+    private Tile[][] tiles;
+    private Text text;
+    private Text text2;
+    private Circle nextPlayerCircle;
+    private String opponentType;
 
     private Parent createContent() {
+        makeOpponentDialog();
+        initializeGame();
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        maxHeight = primaryScreenBounds.getHeight();
-        maxWidth = primaryScreenBounds.getWidth();
+        double maxHeight = primaryScreenBounds.getHeight();
         while (boardSize * tileSize > maxHeight - 100 && tileSize > 1)
             tileSize--;
         Pane root = new Pane();
         root.setPrefSize(boardSize * tileSize, boardSize * tileSize + 30);
+        tiles = new Tile[boardSize][boardSize];
         for (int y = 0; y < boardSize; y++){
             for (int x = 0; x < boardSize; x++){ //x+y) % 3 == 0 ? 0 : ((x+y) % 3 == 1 ? 1 : 2)
                 Tile tile = new Tile(this, board[y][x], 0, x, y, tileSize);
+                tiles[y][x] = tile;
                 initializeGame();
                 tileGroup.getChildren().add(tile);
             }
         }
+        root.getChildren().addAll(tileGroup);
+        addExtras(root);
+        return root;
+    }
+
+    private void makeOpponentDialog() {
+        List<String> choices = new ArrayList<>();
+        choices.add("Inna osoba");
+        choices.add("Algorytm MinMax");
+        choices.add("Algorytm AlphaBeta");
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Inna osoba", choices);
+        dialog.setTitle("Stratego");
+        dialog.setHeaderText("Wybierz przeciwnika");
+        dialog.setContentText("Przeciwnik:");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            System.out.println("Your choice: " + result.get());
+            opponentType = result.get();
+        }
+    }
+
+    private void addExtras(Pane root) {
         TextFlow flow = new TextFlow();
         text = new Text(getPlayerScores(0));
         text2 = new Text(getPlayerScores(1));
@@ -63,8 +94,7 @@ public class Board extends Application {
         nextPlayerCircle.setCenterX(28.0f);
         nextPlayerCircle.setCenterY(boardSize * tileSize + 31);
         nextPlayerCircle.setRadius(15.0f);
-        root.getChildren().addAll(tileGroup, hb, nextPlayerCircle);
-        return root;
+        root.getChildren().addAll(hb, nextPlayerCircle);
     }
 
     private void updatePlayerCircle() {
@@ -87,19 +117,30 @@ public class Board extends Application {
         return str;
     }
 
-    public void showAlert() {
+    public void showEndGameAlert() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Koniec gry");
         Player[] players = game.getPlayers();
         String winner = players[0].getScore() > players[1].getScore() ? players[0].toString() : players[1].toString();
         alert.setHeaderText("Zwycięzca - Gracz " + winner);
         alert.setContentText(getPlayerScores(0) + getPlayerScores(1));
-        alert.showAndWait();
+        alert.show();
     }
 
     public void initializeGame() {
-        PlayerAlphaBeta player1 = new PlayerAlphaBeta('#', 2);
-        PlayerAlphaBeta player2 = new PlayerAlphaBeta('x', 3);
+        PlayerHuman player1 = new PlayerHuman('#');
+        Player player2;
+        switch (opponentType){
+            case "Algorytm MinMax":
+                player2 = new PlayerMinMax('x', 3);
+                break;
+            case "Algorytm AlphaBeta":
+                player2 = new PlayerAlphaBeta('x', 3);
+                break;
+            default:
+                player2 = new PlayerHuman('x');
+                break;
+        }
         game = new Game(boardSize, player1, player2);
         board = game.getBoard();
     }
@@ -109,10 +150,55 @@ public class Board extends Application {
     }
 
     public void makeMove(Square square) {
+        switch (opponentType) {
+            case "Inna osoba":
+                makeMoveHuman(square);
+                break;
+            case "Algorytm MinMax":
+                makeMoveComputer(square);
+                break;
+            case "Algorytm AlphaBeta":
+                makeMoveComputer(square);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void makeMoveComputer(Square square) {
+        game.moveCurrentPlayer(square);
+        game.switchPlayer();
+        text.setText(getPlayerScores(0));
+        text2.setText(getPlayerScores(1));
+        updatePlayerCircle();
+        if (game.isBoardFull()) {
+            showEndGameAlert();
+        }
+        else {
+            game.getCurrentPlayer().move(game.getAvailableMoves(), game);
+            Square lastMarkedSquare = game.getLastMarkedSquare();
+            Tile tile = tiles[lastMarkedSquare.getRow()][lastMarkedSquare.getColumn()];
+            tile.markTile(game.getCurrentPlayer());
+            game.switchPlayer();
+            Timeline timer = new Timeline(
+                    new KeyFrame(Duration.seconds(1), event -> {
+                        text.setText(getPlayerScores(0));
+                        text2.setText(getPlayerScores(1));
+                        updatePlayerCircle();
+                    })
+            );
+            timer.play();
+            if (game.isBoardFull()) {
+                showEndGameAlert();
+            }
+        }
+    }
+
+    private void makeMoveHuman(Square square) {
         game.moveCurrentPlayer(square);
         game.switchPlayer();
         if (game.isBoardFull()) {
-            showAlert();
+            showEndGameAlert();
         }
         text.setText(getPlayerScores(0));
         text2.setText(getPlayerScores(1));
@@ -121,7 +207,6 @@ public class Board extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        initializeGame();
         Scene scene = new Scene(createContent());
         primaryStage.setTitle("Stratego");
         primaryStage.setScene(scene);

@@ -2,10 +2,13 @@ package com.company.GUI;
 
 import com.company.Player;
 import com.company.Square;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 public class Tile extends Rectangle {
     private int color;
@@ -23,17 +26,39 @@ public class Tile extends Rectangle {
         setStroke(Color.valueOf("#3A5C6A"));
         setOnMousePressed(e -> {
             if (!square.isMarked()) {
-                board.makeMove(square);
                 switch (board.getCurrrentPlayer().getNumber()) {
                     case 1:
-                        setFill(Color.valueOf("#7EC79E"));
-                        break;
-                    case 2:
                         setFill(Color.valueOf("#F66467"));
                         break;
+                    case 2:
+                        setFill(Color.valueOf("#7EC79E"));
+                        break;
                 }
+                board.makeMove(square);
+                /*Timeline timer = new Timeline(
+                        new KeyFrame(Duration.seconds(1), event -> board.makeMove(square))
+                );
+                timer.play();*/
             }
         });
+    }
+
+    public void markTile(Player player) {
+        Timeline timer = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> fillColor(player.getNumber()))
+        );
+        timer.play();
+    }
+
+    private void fillColor(int number) {
+        switch (number) {
+            case 1:
+                setFill(Color.valueOf("#F66467"));
+                break;
+            case 2:
+                setFill(Color.valueOf("#7EC79E"));
+                break;
+        }
     }
 
     Color getColor() {

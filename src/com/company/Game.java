@@ -8,10 +8,10 @@ public class Game {
 
     private Square[][] board;
     private Player[] players;
-    Square[] availableMoves;
     private int size;
-
+    private Square lastMarkedSquare;
     private Player cur_player;
+    Square[] availableMoves;
 
     public Game(int size, Player player1, Player player2) {
         this.size = size;
@@ -22,8 +22,17 @@ public class Game {
         initBoard();
     }
 
+    //////////////FORGUI
     public void switchPlayer() {
         cur_player = getOpponent(cur_player);
+    }
+
+    public void setLastMarkedSquare(Square square) {
+        lastMarkedSquare = square;
+    }
+
+    public Square getLastMarkedSquare() {
+        return lastMarkedSquare;
     }
 
     public Player getCurrentPlayer() {
@@ -32,6 +41,10 @@ public class Game {
 
     public Player[] getPlayers() {
         return players;
+    }
+
+    public Square[] getAvailableMoves() {
+        return availableMoves;
     }
 
     public boolean moveCurrentPlayer(Square square) {

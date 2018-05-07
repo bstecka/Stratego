@@ -14,8 +14,10 @@ public class PlayerMinMax extends Player {
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
         Square square = minMax(availableMoves, gameState, this, depth).getKey();
-        if (gameState.markSquareIfFree(square, this))
+        if (gameState.markSquareIfFree(square, this)) {
+            gameState.setLastMarkedSquare(square);
             return true;
+        }
         return false;
     }
 

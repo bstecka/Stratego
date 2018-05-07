@@ -16,8 +16,10 @@ public class PlayerAlphaBeta extends Player {
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
         Square square = minMaxAlphaBeta(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
-        if (gameState.markSquareIfFree(square, this))
+        if (gameState.markSquareIfFree(square, this)) {
+            gameState.setLastMarkedSquare(square);
             return true;
+        }
         return false;
     }
 

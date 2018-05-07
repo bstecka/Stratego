@@ -18,9 +18,9 @@ public class Square {
 
     public boolean isMarked() { return player != null; }
 
-    int getColumn() { return column; }
+    public int getColumn() { return column; }
 
-    int getRow() { return row; }
+    public int getRow() { return row; }
 
     public String toString() {
         if (player == null)
