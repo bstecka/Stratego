@@ -20,6 +20,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +36,10 @@ public class Board extends Application {
     private Text text2;
     private Circle nextPlayerCircle;
     private String opponentType;
+    private boolean startingPlayerIsHuman;
 
     private Parent createContent() {
+        startingPlayerIsHuman = true;
         makeOpponentDialog();
         initializeGame();
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -71,8 +74,27 @@ public class Board extends Application {
         dialog.setContentText("Przeciwnik:");
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            System.out.println("Your choice: " + result.get());
+            System.out.println("Opponent choice: " + result.get());
             opponentType = result.get();
+        }
+        if (opponentType.equals("Algorytm MinMax") || opponentType.equals("Algorytm AlphaBeta"))
+            makeStartingPlayerDialog();
+    }
+
+    private void makeStartingPlayerDialog() {
+        List<String> choices = new ArrayList<>();
+        choices.add("Jako pierwszy");
+        choices.add("Jako drugi");
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Jako pierwszy", choices);
+        dialog.setTitle("Stratego");
+        dialog.setHeaderText("W jakiej kolejności chcesz zacząć?");
+        dialog.setContentText("Zaczynam:");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            System.out.println("Order choice: " + result.get());
+            if (result.get().equals("Jako drugi"))
+                startingPlayerIsHuman = false;
         }
     }
 
@@ -128,16 +150,31 @@ public class Board extends Application {
     }
 
     public void initializeGame() {
-        PlayerHuman player1 = new PlayerHuman('#');
+        Player player1;
         Player player2;
         switch (opponentType){
             case "Algorytm MinMax":
-                player2 = new PlayerMinMax('x', 3);
+                if (startingPlayerIsHuman) {
+                    player1 = new PlayerHuman('#');
+                    player2 = new PlayerMinMax('x', 3);
+                }
+                else {
+                    player1 = new PlayerMinMax('#', 3);
+                    player2 = new PlayerHuman('x');
+                }
                 break;
             case "Algorytm AlphaBeta":
-                player2 = new PlayerAlphaBeta('x', 3);
+                if (startingPlayerIsHuman) {
+                    player1 = new PlayerHuman('#');
+                    player2 = new PlayerAlphaBeta('x', 3);
+                }
+                else {
+                    player1 = new PlayerAlphaBeta('#', 3);
+                    player2 = new PlayerHuman('x');
+                }
                 break;
             default:
+                player1 = new PlayerHuman('#');
                 player2 = new PlayerHuman('x');
                 break;
         }
@@ -155,42 +192,38 @@ public class Board extends Application {
                 makeMoveHuman(square);
                 break;
             case "Algorytm MinMax":
-                makeMoveComputer(square);
+                makeMoveVsComputer(square);
                 break;
             case "Algorytm AlphaBeta":
-                makeMoveComputer(square);
+                makeMoveVsComputer(square);
                 break;
             default:
                 break;
         }
     }
 
-    private void makeMoveComputer(Square square) {
-        game.moveCurrentPlayer(square);
+    private void makeMoveVsComputer(Square square) {
+        makeMoveHuman(square);
+        if (!game.isBoardFull())
+            computersMove();
+    }
+
+    private void computersMove() {
+        game.getCurrentPlayer().move(game.getAvailableMoves(), game);
+        Square lastMarkedSquare = game.getLastMarkedSquare();
+        Tile tile = tiles[lastMarkedSquare.getRow()][lastMarkedSquare.getColumn()];
+        tile.markTile(game.getCurrentPlayer());
         game.switchPlayer();
-        text.setText(getPlayerScores(0));
-        text2.setText(getPlayerScores(1));
-        updatePlayerCircle();
+        Timeline timer = new Timeline(
+                new KeyFrame(Duration.seconds(1), event -> {
+                    text.setText(getPlayerScores(0));
+                    text2.setText(getPlayerScores(1));
+                    updatePlayerCircle();
+                })
+        );
+        timer.play();
         if (game.isBoardFull()) {
             showEndGameAlert();
-        }
-        else {
-            game.getCurrentPlayer().move(game.getAvailableMoves(), game);
-            Square lastMarkedSquare = game.getLastMarkedSquare();
-            Tile tile = tiles[lastMarkedSquare.getRow()][lastMarkedSquare.getColumn()];
-            tile.markTile(game.getCurrentPlayer());
-            game.switchPlayer();
-            Timeline timer = new Timeline(
-                    new KeyFrame(Duration.seconds(1), event -> {
-                        text.setText(getPlayerScores(0));
-                        text2.setText(getPlayerScores(1));
-                        updatePlayerCircle();
-                    })
-            );
-            timer.play();
-            if (game.isBoardFull()) {
-                showEndGameAlert();
-            }
         }
     }
 
@@ -214,6 +247,8 @@ public class Board extends Application {
         primaryStage.setWidth(boardSize * tileSize);
         primaryStage.setHeight(boardSize * tileSize + 90);
         primaryStage.show();
+        if (!startingPlayerIsHuman)
+            computersMove();
     }
 
     public static void main(String[] args) {
