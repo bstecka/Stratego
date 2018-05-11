@@ -30,9 +30,11 @@ public class PlayerMinMax extends Player {
                 score = getScoreDifference(gameState);
                 break;
             case 2:
-                int factoredScoreDifference = gameState.getBoard().length * gameState.getBoard().length * 10 * getScoreDifference(gameState);
+                int factoredScoreDifference = gameState.getBoard().length * gameState.getBoard().length * 100 * getScoreDifference(gameState);
                 int factoredMiddleDiff = prioritizeMiddleEvaluation(gameState, this);
                 factoredMiddleDiff -= prioritizeMiddleEvaluation(gameState, gameState.getOpponent(this));
+                if (factoredMiddleDiff > factoredScoreDifference)
+                    factoredMiddleDiff = factoredScoreDifference - 1;
                 score = factoredScoreDifference + factoredMiddleDiff;
                 break;
         }
@@ -43,6 +45,7 @@ public class PlayerMinMax extends Player {
         return this.getScore() - gameState.getOpponent(this).getScore();
     }
 
+    //consider changing to floats?
     private int prioritizeMiddleEvaluation(Game gameState, Player player) {
         int score = 0;
         Square[][] board = gameState.getBoard();
