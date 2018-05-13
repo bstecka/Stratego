@@ -2,6 +2,10 @@ package com.company;
 
 import javafx.util.Pair;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class PlayerAlphaBeta extends Player {
 
     private int depth, init_alpha, init_beta;
@@ -15,7 +19,7 @@ public class PlayerAlphaBeta extends Player {
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
-        Square square = minMaxAlphaBeta(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
+        Square square = minMaxAlphaBetaH(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
         if (gameState.markSquareIfFree(square, this)) {
             gameState.setLastMarkedSquare(square);
             return true;
@@ -28,12 +32,16 @@ public class PlayerAlphaBeta extends Player {
         return player == this ? value >= beta : value <= alpha;
     }
 
+    private int getScoreDifference(Game gameState) {
+        return this.getScore() - gameState.getOpponent(this).getScore();
+    }
+
     private Pair<Square, Integer> minMaxAlphaBeta(Square[] availableMoves, Game gameState, Player player, int depth, int alpha, int beta) {
         int i, bestWorstValue;
         Square bestMove = null;
         for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}
         if (depth == 0 || i >= availableMoves.length) {
-            bestWorstValue = this.getScore() - gameState.getOpponent(this).getScore();
+            bestWorstValue = getScoreDifference(gameState);
         }
         else {
             if (player == this)
@@ -59,6 +67,67 @@ public class PlayerAlphaBeta extends Player {
                         else if(player != this && bestWorstValue < beta)
                             beta = bestWorstValue;
                         availableMoves[i].freeSquare();
+                        player.setScore(scoreToRestore);
+                    }
+                }
+                else
+                    wasCut = true;
+            }
+        }
+        return new Pair<>(bestMove, bestWorstValue);
+    }
+
+    private Pair<Square, Integer> minMaxAlphaBetaH(Square[] availableMoves, Game gameState, Player player, int depth, int alpha, int beta) {
+        int i, bestWorstValue;
+        Square bestMove = null;
+        for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}
+        if (depth == 0 || i >= availableMoves.length) {
+            bestWorstValue = this.getScore() - gameState.getOpponent(this).getScore();
+        }
+        else {
+            if (player == this)
+                bestWorstValue = Integer.MIN_VALUE;
+            else
+                bestWorstValue = Integer.MAX_VALUE;
+            bestMove = availableMoves[i];
+            int scoreToRestore;
+            boolean wasCut = false;
+
+            ArrayList<Pair<Square, Integer>> sortedMoves = new ArrayList<>();
+            for (i = 0; i < availableMoves.length; i++) {
+                if (!availableMoves[i].isMarked()) {
+                    int scoreForMoveThis = gameState.getScoreForMove(availableMoves[i], this);
+                    availableMoves[i].freeSquare();
+                    sortedMoves.add(new Pair<Square, Integer>(availableMoves[i], scoreForMoveThis));
+                }
+            }
+            Comparator<Pair<Square, Integer>> MoveComparator = new Comparator<Pair<Square, Integer>>() {
+                public int compare(Pair<Square, Integer> s1, Pair<Square, Integer> s2) {
+                    return s1.getValue().compareTo(s2.getValue());
+                }
+            };
+            if (player == this)
+                sortedMoves.sort(MoveComparator.reversed());
+            else
+                sortedMoves.sort(MoveComparator);
+
+            for (i = 0; i < sortedMoves.size() && !wasCut; i++){
+                Square currentMove = sortedMoves.get(i).getKey();
+                if (!cutoff(player, bestWorstValue, alpha, beta)){
+                    if (!currentMove.isMarked()) {
+                        scoreToRestore = player.getScore();
+                        currentMove.markSquare(player);
+                        gameState.updateScoreForMove(currentMove, player);
+                        int currentValue = minMaxAlphaBetaH(availableMoves, gameState, gameState.getOpponent(player), depth - 1, alpha, beta).getValue();
+                        if (player == this && currentValue > bestWorstValue || player != this && currentValue < bestWorstValue) {
+                            bestWorstValue = currentValue;
+                            bestMove = currentMove;
+                        }
+                        if (player == this && bestWorstValue > alpha)
+                            alpha = bestWorstValue;
+                        else if(player != this && bestWorstValue < beta)
+                            beta = bestWorstValue;
+                        currentMove.freeSquare();
                         player.setScore(scoreToRestore);
                     }
                 }
