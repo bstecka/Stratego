@@ -9,22 +9,44 @@ import java.util.stream.Stream;
 public class PlayerAlphaBeta extends Player {
 
     private int depth, init_alpha, init_beta;
+    private int type;
+    public int calls;
 
     public PlayerAlphaBeta(char symbol, int depth) {
         super(symbol);
         this.depth = depth;
         init_alpha = Integer.MIN_VALUE;
         init_beta = Integer.MAX_VALUE;
+        calls = 0;
+        type = 1;
+    }
+
+    public PlayerAlphaBeta(char symbol, int depth, int type) {
+        super(symbol);
+        this.depth = depth;
+        init_alpha = Integer.MIN_VALUE;
+        init_beta = Integer.MAX_VALUE;
+        calls = 0;
+        this.type = type;
     }
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
-        Square square = minMaxAlphaBetaH(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
-        if (gameState.markSquareIfFree(square, this)) {
-            gameState.setLastMarkedSquare(square);
-            return true;
+        if (type == 1) {
+            Square square = minMaxAlphaBeta(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
+            if (gameState.markSquareIfFree(square, this)) {
+                gameState.setLastMarkedSquare(square);
+                return true;
+            }
+            return false;
+        } else {
+            Square square = minMaxAlphaBetaH(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
+            if (gameState.markSquareIfFree(square, this)) {
+                gameState.setLastMarkedSquare(square);
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     private boolean cutoff(Player player, int value, int alpha, int beta) {
@@ -37,6 +59,7 @@ public class PlayerAlphaBeta extends Player {
     }
 
     private Pair<Square, Integer> minMaxAlphaBeta(Square[] availableMoves, Game gameState, Player player, int depth, int alpha, int beta) {
+        calls++;
         int i, bestWorstValue;
         Square bestMove = null;
         for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}
@@ -78,6 +101,7 @@ public class PlayerAlphaBeta extends Player {
     }
 
     private Pair<Square, Integer> minMaxAlphaBetaH(Square[] availableMoves, Game gameState, Player player, int depth, int alpha, int beta) {
+        calls++;
         int i, bestWorstValue;
         Square bestMove = null;
         for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}
@@ -107,9 +131,9 @@ public class PlayerAlphaBeta extends Player {
                 }
             };
             if (player == this)
-                sortedMoves.sort(MoveComparator.reversed());
-            else
                 sortedMoves.sort(MoveComparator);
+            else
+                sortedMoves.sort(MoveComparator.reversed());
 
             for (i = 0; i < sortedMoves.size() && !wasCut; i++){
                 Square currentMove = sortedMoves.get(i).getKey();

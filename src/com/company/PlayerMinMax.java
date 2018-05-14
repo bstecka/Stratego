@@ -6,11 +6,20 @@ public class PlayerMinMax extends Player {
 
     private int depth;
     private int type;
+    public int calls;
 
     public PlayerMinMax(char symbol, int depth) {
         super(symbol);
         this.depth = depth;
-        this.type = 2;
+        this.type = 1;
+        this.calls = 0;
+    }
+
+    public PlayerMinMax(char symbol, int depth, int type) {
+        super(symbol);
+        this.depth = depth;
+        this.type = type;
+        this.calls = 0;
     }
 
     @Override
@@ -56,10 +65,11 @@ public class PlayerMinMax extends Player {
                 }
             }
         }
-        return score/count + 1;
+        return score/(count+1) + 1;
     }
 
     private Pair<Square, Integer> minMax(Square[] availableMoves, Game gameState, Player player, int depth) {
+        calls++;
         int i, bestWorstValue;
         Square bestMove = null;
         for(i = 0; i < availableMoves.length && availableMoves[i].isMarked(); i++){}

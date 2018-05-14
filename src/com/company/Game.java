@@ -3,6 +3,7 @@ package com.company;
 import java.util.Arrays;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class Game {
 
@@ -56,8 +57,8 @@ public class Game {
     public void start() {
         for (int currentPlayer = 0; !isBoardFull(); currentPlayer ^= 1) {
             boolean isMoveValid = players[currentPlayer].move(availableMoves, this);
-            System.out.println(isMoveValid);
-            System.out.println(this.toString());
+            //System.out.println(isMoveValid);
+            //System.out.println(this.toString());
         }
     }
 
@@ -122,6 +123,18 @@ public class Game {
     public int getWinningScore() {
         return max(players[0].getScore(), players[1].getScore());
     }
+
+    public int getLosingScore() {
+        return min(players[0].getScore(), players[1].getScore());
+    }
+
+    public void printWinner() {
+        if (players[0].getScore() > players[1].getScore())
+            System.out.println(players[0]);
+        else
+            System.out.println(players[0]);
+    }
+
 
     public int updateScoreForMove(Square square, Player player) {
         int score = getScoreForMove(square, player);
