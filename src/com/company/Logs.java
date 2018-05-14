@@ -10,21 +10,11 @@ public class Logs {
     public static void makeGamesMvA(int size, int depth) {
         for (int i = 3; i <= size; i++) {
             for (int j = 1; j <= depth; j++) {
-                PlayerMinMax player1 = new PlayerMinMax('#', j);
-                PlayerAlphaBeta player2 = new PlayerAlphaBeta('x', j);
+                PlayerMinMax player2 = new PlayerMinMax('#', j);
+                PlayerAlphaBeta player1 = new PlayerAlphaBeta('x', j);
                 Game game = new Game(i, player1, player2);
                 game.start();
-                System.out.println("minmax vs alphabeta, size: " + i + ", depth: " + j + " " + j);
-                //System.out.println(game.getWinningScore() + " " + game.getLosingScore());
-                System.out.println("calls: " + player1.calls + " " + player2.calls);
-                PlayerAlphaBeta player11 = new PlayerAlphaBeta('x', j);
-                PlayerMinMax player21 = new PlayerMinMax('#', j);
-                game = new Game(i, player11, player21);
-                game.start();
-                System.out.println("alphabeta vs minmax, size: " + i + ", depth: " + j + " " + j);
-                //System.out.println(game.getWinningScore() + " " + game.getLosingScore());
-                System.out.println("calls: " + player11.calls + " " + player21.calls);
-                game.printWinner();
+                System.out.println(player1.getAverageTime() + ", " + player2.getAverageTime());
             }
         }
     }
@@ -46,21 +36,11 @@ public class Logs {
     public static void makeGamesAvAH(int size, int depth) {
         for (int i = 3; i <= size; i++) {
             for (int j = 1; j <= depth; j++) {
-                PlayerAlphaBeta player1 = new PlayerAlphaBeta('#', j, 1);
-                PlayerAlphaBeta player2 = new PlayerAlphaBeta('x', j, 2);
+                PlayerAlphaBeta player1 = new PlayerAlphaBeta('#', j, 2);
+                PlayerAlphaBeta player2 = new PlayerAlphaBeta('x', j, 1);
                 Game game = new Game(i, player1, player2);
                 game.start();
-                System.out.println("alphabeta vs alphabetaH, size: " + i + ", depth: " + j + " " + j);
-                //System.out.println(game.getWinningScore() + " " + game.getLosingScore());
-                System.out.println("calls: "+ player1.calls + " " + player2.calls);
-                PlayerAlphaBeta player11 = new PlayerAlphaBeta('x', j, 2);
-                PlayerMinMax player21 = new PlayerMinMax('#', j, 1);
-                game = new Game(i, player11, player21);
-                game.start();
-                System.out.println("alphabetaH vs alphabeta, size: " + i + ", depth: " + j + " " + j);
-                //System.out.println(game.getWinningScore() + " " + game.getLosingScore());
-                System.out.println("calls: " + player11.calls + " " + player21.calls);
-                game.printWinner();
+                System.out.println(player1.getAverageTime() + ", " + player2.getAverageTime());
             }
         }
     }

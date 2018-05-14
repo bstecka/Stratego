@@ -11,6 +11,8 @@ public class PlayerAlphaBeta extends Player {
     private int depth, init_alpha, init_beta;
     private int type;
     public int calls;
+    public long time;
+    public int count;
 
     public PlayerAlphaBeta(char symbol, int depth) {
         super(symbol);
@@ -19,6 +21,8 @@ public class PlayerAlphaBeta extends Player {
         init_beta = Integer.MAX_VALUE;
         calls = 0;
         type = 1;
+        this.count = 0;
+        this.time = 0;
     }
 
     public PlayerAlphaBeta(char symbol, int depth, int type) {
@@ -28,14 +32,22 @@ public class PlayerAlphaBeta extends Player {
         init_beta = Integer.MAX_VALUE;
         calls = 0;
         this.type = type;
+        this.count = 0;
+        this.time = 0;
     }
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
+        long start = System.nanoTime();
         if (type == 1) {
             Square square = minMaxAlphaBeta(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
             if (gameState.markSquareIfFree(square, this)) {
                 gameState.setLastMarkedSquare(square);
+                if (count < 10){
+                    long end = System.nanoTime();
+                    time += (end - start);
+                    count++;
+                }
                 return true;
             }
             return false;
@@ -43,10 +55,19 @@ public class PlayerAlphaBeta extends Player {
             Square square = minMaxAlphaBetaH(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
             if (gameState.markSquareIfFree(square, this)) {
                 gameState.setLastMarkedSquare(square);
+                if (count < 10){
+                    long end = System.nanoTime();
+                    time += (end - start);
+                    count++;
+                }
                 return true;
             }
             return false;
         }
+    }
+
+    public long getAverageTime(){
+        return count > 0 ? time/count : time;
     }
 
     private boolean cutoff(Player player, int value, int alpha, int beta) {

@@ -7,12 +7,16 @@ public class PlayerMinMax extends Player {
     private int depth;
     private int type;
     public int calls;
+    public long time;
+    public int count;
 
     public PlayerMinMax(char symbol, int depth) {
         super(symbol);
         this.depth = depth;
         this.type = 1;
         this.calls = 0;
+        this.count = 0;
+        this.time = 0;
     }
 
     public PlayerMinMax(char symbol, int depth, int type) {
@@ -20,16 +24,28 @@ public class PlayerMinMax extends Player {
         this.depth = depth;
         this.type = type;
         this.calls = 0;
+        this.count = 0;
+        this.time = 0;
     }
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
+        long start = System.nanoTime();
         Square square = minMax(availableMoves, gameState, this, depth).getKey();
         if (gameState.markSquareIfFree(square, this)) {
             gameState.setLastMarkedSquare(square);
+            if (count < 10){
+                long end = System.nanoTime();
+                time += (end - start);
+                count++;
+            }
             return true;
         }
         return false;
+    }
+
+    public long getAverageTime(){
+        return count > 0 ? time/count : time;
     }
 
     private int getBestWorstValue(Game gameState) {
