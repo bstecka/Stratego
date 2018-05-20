@@ -1,6 +1,7 @@
 package com.company.GUI;
 
 import com.company.Player;
+import com.company.PlayerHuman;
 import com.company.Square;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -25,7 +26,7 @@ public class Tile extends Rectangle {
         setFill(getColor());
         setStroke(Color.valueOf("#3A5C6A"));
         setOnMousePressed(e -> {
-            if (!square.isMarked()) {
+            if (!square.isMarked() && board.getCurrrentPlayer() instanceof PlayerHuman) {
                 switch (board.getCurrrentPlayer().getNumber()) {
                     case 1:
                         setFill(Color.valueOf("#F66467"));
@@ -35,6 +36,7 @@ public class Tile extends Rectangle {
                         break;
                 }
                 board.makeMove(square);
+                board.switchPlayer();
             }
         });
     }

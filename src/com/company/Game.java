@@ -48,8 +48,7 @@ public class Game {
     }
 
     public boolean moveCurrentPlayer(Square square) {
-        boolean isMoveValid = markSquareIfFree(square, cur_player);
-        return isMoveValid;
+        return markSquareIfFree(square, cur_player);
     }
 
     //////////////FORCONSOLE
@@ -88,34 +87,39 @@ public class Game {
 
     //marks Square
     public int getScoreForMove(Square square, Player player) {
-        boolean wasMarked = square.isMarked();
-
         square.markSquare(player);
-        int i, depth, points = 0;
-        int row = square.getRow(), column = square.getColumn();
-
+        int points = getScoreDiagonals(square);
+        int row = square.getRow(), col = square.getColumn();
+        int i;
+        for(i = 0; i < size && board[i][col].isMarked(); i++){}
+        if(i == size)
+            points += size;
         for(i = 0; i < size && board[row][i].isMarked(); i++){}
         if(i == size)
             points += size;
+        return points;
+    }
 
-        for(i = 0; i < size && board[i][column].isMarked(); i++){}
-        if(i == size)
-            points += size;
-
-        int pointsInDiagonal = 0;
-        for(depth = row, i = 0; column - depth < 0; depth--, i++) {}
-        for(; i < size && column - depth < size && board[i][column - depth].isMarked(); i++, depth--, pointsInDiagonal++) {}
-        if((i == size || column - depth == size) && pointsInDiagonal > 1)
-            points += pointsInDiagonal;
-
-        pointsInDiagonal = 0;
-        for(depth = row, i = 0; column + depth >= size; depth--, i++) {}
-        for(; i < size && column + depth >= 0 && board[i][column + depth].isMarked(); i++, depth--, pointsInDiagonal++) {}
-        if((i == size || column + depth == -1) && pointsInDiagonal > 1)
-            points += pointsInDiagonal;
-
-        //if (!wasMarked)
-        //    square.freeSquare();
+    private int getScoreDiagonals(Square square) {
+        int row = square.getRow(), col = square.getColumn();
+        int i, j, points = 0, diagonal = 0;
+        for(j = row, i = 0; col - j < 0; j--, i++) {}
+        while(i < size && col - j < size && board[i][col - j].isMarked()) {
+            i++;
+            j--;
+            diagonal++;
+        }
+        if((i == size || col - j == size) && diagonal != 1)
+            points += diagonal;
+        diagonal = 0;
+        for(j = row, i = 0; col + j >= size; j--, i++) {}
+        while(i < size && col + j >= 0 && board[i][col + j].isMarked()) {
+            i++;
+            j--;
+            diagonal++;
+        }
+        if((i == size || col + j == -1) && diagonal != 1)
+            points += diagonal;
         return points;
     }
 

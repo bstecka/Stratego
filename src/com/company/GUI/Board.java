@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Spinner;
 import javafx.scene.shape.Circle;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -26,14 +27,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class Board extends Application {
-    private int tileSize = 80;
-    private int boardSize = 5;
+    private int tileSize = 80, boardSize = 5;
     private Group tileGroup = new Group();
     private Game game;
     private Square[][] board;
     private Tile[][] tiles;
-    private Text text;
-    private Text text2;
+    private Text text, text2;
     private Circle nextPlayerCircle;
     private String opponentType;
     private boolean startingPlayerIsHuman;
@@ -41,6 +40,7 @@ public class Board extends Application {
     private Parent createContent() {
         startingPlayerIsHuman = true;
         makeOpponentDialog();
+        makeSizeDialog();
         initializeGame();
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         double maxHeight = primaryScreenBounds.getHeight();
@@ -79,6 +79,11 @@ public class Board extends Application {
         }
         if (opponentType.equals("Algorytm MinMax") || opponentType.equals("Algorytm AlphaBeta"))
             makeStartingPlayerDialog();
+    }
+
+    private void makeSizeDialog() {
+        Spinner<Integer> spinner1 = new Spinner<>(3, 20, 4);
+        int value = spinner1.getValue();
     }
 
     private void makeStartingPlayerDialog() {
@@ -208,6 +213,10 @@ public class Board extends Application {
             computersMove();
     }
 
+    public void switchPlayer() {
+        game.switchPlayer();
+    }
+
     private void computersMove() {
         game.getCurrentPlayer().move(game.getAvailableMoves(), game);
         Square lastMarkedSquare = game.getLastMarkedSquare();
@@ -219,6 +228,7 @@ public class Board extends Application {
                     text.setText(getPlayerScores(0));
                     text2.setText(getPlayerScores(1));
                     updatePlayerCircle();
+                    game.switchPlayer();
                 })
         );
         timer.play();
