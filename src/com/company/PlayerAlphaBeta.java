@@ -3,8 +3,6 @@ package com.company;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PlayerAlphaBeta extends Player {
 
