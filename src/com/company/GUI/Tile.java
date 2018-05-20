@@ -26,7 +26,7 @@ public class Tile extends Rectangle {
         setFill(getColor());
         setStroke(Color.valueOf("#3A5C6A"));
         setOnMousePressed(e -> {
-            if (!square.isMarked()) {
+            if (!square.isMarked() && board.getCurrrentPlayer() instanceof PlayerHuman) {
                 switch (board.getCurrrentPlayer().getNumber()) {
                     case 1:
                         setFill(Color.valueOf("#F66467"));
@@ -41,10 +41,11 @@ public class Tile extends Rectangle {
     }
 
     public void markTile(Player player) {
-        Timeline timer = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> fillColor(player.getNumber()))
-        );
-        timer.play();
+        fillColor(player.getNumber()); square.markSquare(player);
+        //Timeline timer = new Timeline(
+        //        new KeyFrame(Duration.seconds(1), event -> { fillColor(player.getNumber()); square.markSquare(player); }
+        //));
+        //timer.play();
     }
 
     private void fillColor(int number) {

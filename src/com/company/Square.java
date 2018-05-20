@@ -10,7 +10,7 @@ public class Square {
         this.column = column;
     }
 
-    void markSquare(Player player) { this.player = player; }
+    public void markSquare(Player player) { this.player = player; }
 
     void freeSquare() { this.player = null; }
 

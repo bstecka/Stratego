@@ -220,20 +220,21 @@ public class Board extends Application {
     private void computersMove() {
         game.getCurrentPlayer().move(game.getAvailableMoves(), game);
         Square lastMarkedSquare = game.getLastMarkedSquare();
+        System.out.println(lastMarkedSquare.getPlayer());
         Tile tile = tiles[lastMarkedSquare.getRow()][lastMarkedSquare.getColumn()];
-        tile.markTile(game.getCurrentPlayer());
-        game.switchPlayer();
         Timeline timer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
+                    tile.markTile(game.getCurrentPlayer());
                     text.setText(getPlayerScores(0));
                     text2.setText(getPlayerScores(1));
                     updatePlayerCircle();
+                    game.switchPlayer();
+                    if (game.isBoardFull()) {
+                        showEndGameAlert();
+                    }
                 })
         );
         timer.play();
-        if (game.isBoardFull()) {
-            showEndGameAlert();
-        }
     }
 
     private void makeMoveHuman(Square square) {
