@@ -35,10 +35,6 @@ public class Tile extends Rectangle {
                         break;
                 }
                 board.makeMove(square);
-                /*Timeline timer = new Timeline(
-                        new KeyFrame(Duration.seconds(1), event -> board.makeMove(square))
-                );
-                timer.play();*/
             }
         });
     }
