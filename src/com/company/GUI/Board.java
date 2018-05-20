@@ -187,7 +187,7 @@ public class Board extends Application {
         board = game.getBoard();
     }
 
-    public Player getCurrrentPlayer() {
+    public Player getCurrentPlayer() {
         return game.getCurrentPlayer();
     }
 

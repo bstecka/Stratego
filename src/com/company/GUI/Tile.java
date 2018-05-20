@@ -3,13 +3,8 @@ package com.company.GUI;
 import com.company.Player;
 import com.company.PlayerHuman;
 import com.company.Square;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.beans.property.DoubleProperty;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
 
 public class Tile extends Rectangle {
     private int color;
@@ -26,8 +21,8 @@ public class Tile extends Rectangle {
         setFill(getColor());
         setStroke(Color.valueOf("#3A5C6A"));
         setOnMousePressed(e -> {
-            if (!square.isMarked() && board.getCurrrentPlayer() instanceof PlayerHuman) {
-                switch (board.getCurrrentPlayer().getNumber()) {
+            if (!square.isMarked() && board.getCurrentPlayer() instanceof PlayerHuman) {
+                switch (board.getCurrentPlayer().getNumber()) {
                     case 1:
                         setFill(Color.valueOf("#F66467"));
                         break;
