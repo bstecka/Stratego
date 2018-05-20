@@ -107,9 +107,9 @@ public class PlayerAlphaBeta extends Player {
                 }
             };
             if (player == this)
-                sortedMoves.sort(MoveComparator.reversed());
-            else
                 sortedMoves.sort(MoveComparator);
+            else
+                sortedMoves.sort(MoveComparator.reversed());
 
             for (i = 0; i < sortedMoves.size() && !wasCut; i++){
                 Square currentMove = sortedMoves.get(i).getKey();
