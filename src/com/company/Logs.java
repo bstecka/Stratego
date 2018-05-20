@@ -4,7 +4,7 @@ public class Logs {
 
     public static void main(String[] args) {
         //makeGamesAvA(8, 5);
-        makeGamesAvAH(7, 5);
+        makeGamesMvMH(7, 5);
     }
 
     public static void makeGamesMvA(int size, int depth) {
@@ -84,23 +84,24 @@ public class Logs {
     public static void makeGamesMvMH(int size, int depth) {
         for (int i = 3; i <= size; i++) {
             for (int j = 1; j <= depth; j++) {
+                //System.out.println("minmax vs minmaxH, size: " + i + ", depth: " + j + " k");
                 for (int k = j; k <= depth; k++) {
                     if (j != k) {
                         PlayerMinMax player1 = new PlayerMinMax('x', j, 1);
-                        PlayerMinMax player2 = new PlayerMinMax('#', k, 2);
+                        PlayerMinMax player2 = new PlayerMinMax('#', k, 3);
                         Game game = new Game(i, player1, player2);
                         game.start();
-                        System.out.println("minmax vs minmaxH, size: " + i + ", depth: " + j + " " + k);
-                        System.out.println(player1.getScore() + " " + player2.getScore());
-                        System.out.println("calls: " + player1.calls + " " + player2.calls);
+                        //System.out.println("minmax vs minmaxH, size: " + i + ", depth: " + j + " " + k);
+                        System.out.print(j + ", " + k + ", " + player1.getScore() + ", " + player2.getScore() + ", ");
+                        //System.out.println("calls: " + player1.calls + " " + player2.calls);
 
                         player1 = new PlayerMinMax('#', j, 2);
                         player2 = new PlayerMinMax('x', k, 1);
                         game = new Game(i, player1, player2);
                         game.start();
-                        System.out.println("minmaxH vs minmax, size: " + i + ", depth: " + j + " " + k);
-                        System.out.println(player1.getScore() + " " + player2.getScore());
-                        System.out.println("calls: " + player1.calls + " " + player2.calls);
+                        //System.out.println("minmaxH vs minmax, size: " + i + ", depth: " + j + " " + k);
+                        System.out.println(player1.getScore() + ", " + player2.getScore());
+                        //System.out.println("calls: " + player1.calls + " " + player2.calls);
                     }
                 }
             }

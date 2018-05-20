@@ -60,6 +60,9 @@ public class PlayerMinMax extends Player {
                 factoredMiddleDiff -= prioritizeMiddleEvaluation(gameState, gameState.getOpponent(this));
                 score = factoredScoreDifference + factoredMiddleDiff;
                 break;
+            case 3:
+                score = 100 * getScoreDifference(gameState) + countEmptySquares(gameState);
+                break;
         }
         return score;
     }
@@ -67,6 +70,34 @@ public class PlayerMinMax extends Player {
     private int getScoreDifference(Game gameState) {
         return this.getScore() - gameState.getOpponent(this).getScore();
     }
+
+    private int countEmptySquares(Game gameState) {
+        Square[][] board = gameState.getBoard();
+        int count = 0, count_marked = 0;
+        for (int i = 0; i < board.length; i++){
+            for (int j = 0; j < board.length; j++){
+                if (board[i][j].isMarked()) {
+                    count += countEmptyNeighbours(board, i, j);
+                    count_marked++;
+                }
+            }
+        }
+        return count_marked > 0 ? count/count_marked : count;
+    }
+
+    private int countEmptyNeighbours(Square[][] board, int i, int j) {
+        int count = 0;
+        for (int k = i - 1; k < i + 1; k++){
+            for (int l = j - 1; l < j + 1; l++){
+                if (k >= 0 && l>= 0 && k < board.length && l < board.length) {
+                    if (!board[k][l].isMarked())
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+
 
     private int prioritizeMiddleEvaluation(Game gameState, Player player) {
         int score = 0, count = 0;
