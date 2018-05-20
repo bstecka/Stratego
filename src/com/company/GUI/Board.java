@@ -228,7 +228,6 @@ public class Board extends Application {
                     text.setText(getPlayerScores(0));
                     text2.setText(getPlayerScores(1));
                     updatePlayerCircle();
-                    game.switchPlayer();
                 })
         );
         timer.play();

@@ -26,7 +26,7 @@ public class Tile extends Rectangle {
         setFill(getColor());
         setStroke(Color.valueOf("#3A5C6A"));
         setOnMousePressed(e -> {
-            if (!square.isMarked() && board.getCurrrentPlayer() instanceof PlayerHuman) {
+            if (!square.isMarked()) {
                 switch (board.getCurrrentPlayer().getNumber()) {
                     case 1:
                         setFill(Color.valueOf("#F66467"));
@@ -36,7 +36,6 @@ public class Tile extends Rectangle {
                         break;
                 }
                 board.makeMove(square);
-                board.switchPlayer();
             }
         });
     }
