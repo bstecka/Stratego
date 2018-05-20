@@ -17,7 +17,7 @@ public class PlayerAlphaBeta extends Player {
 
     @Override
     public boolean move(Square[] availableMoves, Game gameState) {
-        Square square = minMaxAlphaBetaH(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
+        Square square = minMaxAlphaBeta(availableMoves, gameState, this, depth, init_alpha, init_beta).getKey();
         if (gameState.markSquareIfFree(square, this)) {
             gameState.setLastMarkedSquare(square);
             return true;
@@ -26,8 +26,7 @@ public class PlayerAlphaBeta extends Player {
     }
 
     private boolean cutoff(Player player, int value, int alpha, int beta) {
-        //return (player == this && value >= beta || player != this && value <= alpha);
-        return player == this ? value >= beta : value <= alpha;
+        return (player == this && value >= beta) || (player != this && value <= alpha);
     }
 
     private int getScoreDifference(Game gameState) {

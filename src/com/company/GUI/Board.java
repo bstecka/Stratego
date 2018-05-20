@@ -1,6 +1,7 @@
 package com.company.GUI;
 
 import com.company.*;
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.company.Constants.*;
+
 public class Board extends Application {
     private int tileSize = 80, boardSize = 5;
     private Group tileGroup = new Group();
@@ -40,7 +43,6 @@ public class Board extends Application {
     private Parent createContent() {
         startingPlayerIsHuman = true;
         makeOpponentDialog();
-        makeSizeDialog();
         initializeGame();
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         double maxHeight = primaryScreenBounds.getHeight();
@@ -64,11 +66,11 @@ public class Board extends Application {
 
     private void makeOpponentDialog() {
         List<String> choices = new ArrayList<>();
-        choices.add("Inna osoba");
-        choices.add("Algorytm MinMax");
-        choices.add("Algorytm AlphaBeta");
+        choices.add(Constants.TYPE_HUMAN);
+        choices.add(Constants.TYPE_MINMAX);
+        choices.add(Constants.TYPE_ALPHABETA);
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Inna osoba", choices);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(Constants.TYPE_HUMAN, choices);
         dialog.setTitle("Stratego");
         dialog.setHeaderText("Wybierz przeciwnika");
         dialog.setContentText("Przeciwnik:");
@@ -77,28 +79,23 @@ public class Board extends Application {
             System.out.println("Opponent choice: " + result.get());
             opponentType = result.get();
         }
-        if (opponentType.equals("Algorytm MinMax") || opponentType.equals("Algorytm AlphaBeta"))
+        if (opponentType.equals(Constants.TYPE_MINMAX) || opponentType.equals(Constants.TYPE_ALPHABETA))
             makeStartingPlayerDialog();
-    }
-
-    private void makeSizeDialog() {
-        Spinner<Integer> spinner1 = new Spinner<>(3, 20, 4);
-        int value = spinner1.getValue();
     }
 
     private void makeStartingPlayerDialog() {
         List<String> choices = new ArrayList<>();
-        choices.add("Jako pierwszy");
-        choices.add("Jako drugi");
+        choices.add(Constants.ORDER_FIRST);
+        choices.add(Constants.ORDER_SECOND);
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Jako pierwszy", choices);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(Constants.ORDER_FIRST, choices);
         dialog.setTitle("Stratego");
         dialog.setHeaderText("W jakiej kolejności chcesz zacząć?");
         dialog.setContentText("Zaczynam:");
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             System.out.println("Order choice: " + result.get());
-            if (result.get().equals("Jako drugi"))
+            if (result.get().equals(Constants.ORDER_SECOND))
                 startingPlayerIsHuman = false;
         }
     }
@@ -154,33 +151,33 @@ public class Board extends Application {
         alert.show();
     }
 
-    public void initializeGame() {
+    private void initializeGame() {
         Player player1;
         Player player2;
         switch (opponentType){
-            case "Algorytm MinMax":
+            case Constants.TYPE_MINMAX:
                 if (startingPlayerIsHuman) {
-                    player1 = new PlayerHuman('#');
-                    player2 = new PlayerMinMax('x', 3);
+                    player1 = new PlayerHuman('1');
+                    player2 = new PlayerMinMax('2', 3);
                 }
                 else {
-                    player1 = new PlayerMinMax('#', 3);
-                    player2 = new PlayerHuman('x');
+                    player1 = new PlayerMinMax('1', 3);
+                    player2 = new PlayerHuman('2');
                 }
                 break;
-            case "Algorytm AlphaBeta":
+            case Constants.TYPE_ALPHABETA:
                 if (startingPlayerIsHuman) {
-                    player1 = new PlayerHuman('#');
-                    player2 = new PlayerAlphaBeta('x', 3);
+                    player1 = new PlayerHuman('1');
+                    player2 = new PlayerAlphaBeta('2', 3);
                 }
                 else {
-                    player1 = new PlayerAlphaBeta('#', 3);
-                    player2 = new PlayerHuman('x');
+                    player1 = new PlayerAlphaBeta('1', 3);
+                    player2 = new PlayerHuman('2');
                 }
                 break;
             default:
-                player1 = new PlayerHuman('#');
-                player2 = new PlayerHuman('x');
+                player1 = new PlayerHuman('1');
+                player2 = new PlayerHuman('2');
                 break;
         }
         game = new Game(boardSize, player1, player2);
@@ -193,13 +190,13 @@ public class Board extends Application {
 
     public void makeMove(Square square) {
         switch (opponentType) {
-            case "Inna osoba":
+            case Constants.TYPE_HUMAN:
                 makeMoveHuman(square);
                 break;
-            case "Algorytm MinMax":
+            case Constants.TYPE_MINMAX:
                 makeMoveVsComputer(square);
                 break;
-            case "Algorytm AlphaBeta":
+            case Constants.TYPE_ALPHABETA:
                 makeMoveVsComputer(square);
                 break;
             default:
@@ -213,22 +210,17 @@ public class Board extends Application {
             computersMove();
     }
 
-    public void switchPlayer() {
-        game.switchPlayer();
-    }
-
     private void computersMove() {
         game.getCurrentPlayer().move(game.getAvailableMoves(), game);
         Square lastMarkedSquare = game.getLastMarkedSquare();
-        System.out.println(lastMarkedSquare.getPlayer());
         Tile tile = tiles[lastMarkedSquare.getRow()][lastMarkedSquare.getColumn()];
         Timeline timer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
                     tile.markTile(game.getCurrentPlayer());
                     text.setText(getPlayerScores(0));
                     text2.setText(getPlayerScores(1));
-                    updatePlayerCircle();
                     game.switchPlayer();
+                    updatePlayerCircle();
                     if (game.isBoardFull()) {
                         showEndGameAlert();
                     }

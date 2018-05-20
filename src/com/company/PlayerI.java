@@ -2,13 +2,13 @@ package com.company;
 
 public interface PlayerI {
 
-    public boolean move(Square[] availableMoves, Game gameState);
+    boolean move(Square[] availableMoves, Game gameState);
 
-    public String toString();
+    String toString();
 
-    public void setScore(int score);
+    void setScore(int score);
 
-    public void incrementScore(int score);
+    void incrementScore(int score);
 
-    public int getScore();
+    int getScore();
 }
