@@ -1,18 +1,18 @@
 package com.company.GUI;
 
 import com.company.*;
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.Spinner;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -23,6 +23,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +44,7 @@ public class Board extends Application {
 
     private Parent createContent() {
         startingPlayerIsHuman = true;
+        makeSizeDialog();
         makeOpponentDialog();
         initializeGame();
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -64,12 +67,60 @@ public class Board extends Application {
         return root;
     }
 
+    public static boolean isNumeric(String str)
+    {
+        NumberFormat formatter = NumberFormat.getInstance();
+        ParsePosition pos = new ParsePosition(0);
+        formatter.parse(str, pos);
+        return str.length() == pos.getIndex();
+    }
+
+    private void makeSizeDialog() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Stratego");
+        dialog.setHeaderText("Podaj rozmiar planszy");
+        ButtonType okButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        TextField textField = new TextField();
+        textField.setText("5");
+        Node okButton = dialog.getDialogPane().lookupButton(okButtonType);
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() < 1)
+                okButton.setDisable(true);
+            else if (isNumeric(newValue))
+                okButton.setDisable(Integer.valueOf(newValue) < 3 || Integer.valueOf(newValue) > 80);
+            else
+                okButton.setDisable(true);
+        });
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.add(new Label("Rozmiar planszy: "), 0, 0);
+        grid.add(textField, 1, 0);
+        dialog.getDialogPane().setContent(grid);
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == okButtonType) {
+                return textField.getText();
+            }
+            return null;
+        });
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            try {
+                int value = Integer.valueOf(result.get());
+                boardSize = value;
+            } catch (NumberFormatException e) {
+                System.out.println("Could not parse value");
+            }
+        }
+    }
+
     private void makeOpponentDialog() {
         List<String> choices = new ArrayList<>();
         choices.add(Constants.TYPE_HUMAN);
         choices.add(Constants.TYPE_MINMAX);
         choices.add(Constants.TYPE_ALPHABETA);
-
         ChoiceDialog<String> dialog = new ChoiceDialog<>(Constants.TYPE_HUMAN, choices);
         dialog.setTitle("Stratego");
         dialog.setHeaderText("Wybierz przeciwnika");
